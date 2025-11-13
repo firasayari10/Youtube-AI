@@ -1,13 +1,27 @@
 
 
 
-export default function Home() {
+import { HydrateClient, trpc} from "@/trpc/server"
+import { PageClient} from "./client"
+import { Suspense } from "react";
+import { ErrorBoundary} from "react-error-boundary"
+export default async function Home() {
+  void trpc.hello.prefetch({text:"firas"})
   return (
    <div>
+    <HydrateClient>
+      <Suspense fallback={
+        <p>
+          Loading ...
+        </p>
+      }>
+        <ErrorBoundary fallback={<p>Error </p>}>
+            <PageClient />
+        </ErrorBoundary>
+          
+      </Suspense>
+    </HydrateClient>
     
-    <p className=" text-xl font-semibold tracking-tight">
-       load videos here 
-    </p>
    </div>
   );
 }
