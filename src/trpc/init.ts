@@ -1,7 +1,7 @@
 import { db } from "@/db";
 import { users } from "@/db/schema";
 import { auth } from "@clerk/nextjs/server";
-import { initTRPC, TRPCError} from "@trpc/server" ;
+import { initTRPC, TRPCError, } from "@trpc/server" ;
 import { eq } from "drizzle-orm";
 import { cache} from "react" ;
 import superjson from "superjson"
@@ -10,7 +10,7 @@ export const createTRPCContext = cache(async()=>{
     /**
      * @see https://trpc.io/docs/server/context
      */
-    return { clerkUserId: userId}
+    return {clerkUserId: userId ?? null}
 });
 
 export type Context = Awaited<ReturnType<typeof createTRPCContext>>
@@ -20,7 +20,7 @@ const t = initTRPC.context<Context>().create({
     /**
      * @see https://trpc.io/docs/server/data-transformers
      */
-     transformer : superjson
+     transformer : superjson,
     
 });
 

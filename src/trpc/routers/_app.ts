@@ -9,7 +9,7 @@ export const appRouter = createTRPCRouter({
         text:z.string(),
     })
     ).query( (opts)=>{
-        console.log({dbUser: opts.ctx.clerkUserId})
+        console.log({dbUser :opts.ctx.user})
       
         return {
             greeting: ` hello  ${opts.input.text}`,

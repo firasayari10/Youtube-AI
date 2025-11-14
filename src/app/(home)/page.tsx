@@ -6,7 +6,7 @@ import { PageClient} from "./client"
 import { Suspense } from "react";
 import { ErrorBoundary} from "react-error-boundary"
 export default async function Home() {
-await trpc.hello.prefetch({text:"firas", })
+await trpc.hello.prefetch({text:"firas" })
   return (
    <div>
     <HydrateClient>

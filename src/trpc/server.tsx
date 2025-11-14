@@ -7,8 +7,8 @@ import {appRouter} from "./routers/_app";
 
 
 export const  getQueryClient = cache(makeQueryClient);
-const caller = createCallerFactory(appRouter)(createTRPCContext);
+const caller = createCallerFactory(appRouter)( createTRPCContext);
 export const {trpc,HydrateClient} = createHydrationHelpers<typeof appRouter>(
-    caller,
+     await caller,
     getQueryClient
 )
