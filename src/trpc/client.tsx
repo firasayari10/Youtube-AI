@@ -29,8 +29,14 @@ export function TRPCProvider(props: { children: React.ReactNode }) {
      
       links: [
         httpBatchLink({
-          url: getUrl(),        
+         
           transformer: superjson, 
+           url: getUrl(),     
+           async headers(){
+            const headers = new Headers();
+            headers.set("x-trpc-source","nextjs-react");
+            return headers
+           }   
         }),
       ],
     })
