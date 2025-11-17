@@ -4,34 +4,57 @@ import { trpc } from "@/trpc/client";
 import { ErrorBoundary } from "react-error-boundary";
 import { Suspense } from "react";
 import { FilterCarousel } from "@/components/filter-carousel";
+import { useRouter } from "next/navigation";
 
 
 interface CategoriesSectionProps {
-    categoryId?:string;
+    categoryId?: string;
 };
 
-export const CategoriesSection  =({categoryId}:CategoriesSectionProps )=>{
+export const CategoriesSection = ({categoryId}: CategoriesSectionProps) => {
     return (
-        <Suspense fallback={
-            <p>
-                Loading ....
-            </p>
-        } >
-            <ErrorBoundary fallback={<p>Loading .... </p> }>
+        <Suspense fallback={<CategoriesSkeleton />}>
+            <ErrorBoundary fallback={<p>Error loading categories</p>}>
                 <CategoriesSectionSuspense categoryId={categoryId} />
             </ErrorBoundary>
-
         </Suspense>
     )
 }
 
- const  CategoriesSectionSuspense=({categoryId}:CategoriesSectionProps)=>{
-       //const {data:categories} = trpc.categories.getMany.useSuspenseQuery();
-        
-       const [categories] = trpc.categories.getMany.useSuspenseQuery();
-        const data = categories.map(({name, id})=> ({
-            value:id,
-            label:name
-        }))
-        return <FilterCarousel   data={data}/>
+const CategoriesSkeleton = () => {
+    return <FilterCarousel 
+        data={[]} 
+        isLoading={true} 
+        onSelect={() => {}} 
+    />
+}
+
+
+const CategoriesSectionSuspense = ({categoryId}: CategoriesSectionProps) => {
+    const router = useRouter();
+    const [categories] = trpc.categories.getMany.useSuspenseQuery();
+    
+    const data = categories.map(({name, id}) => ({
+        value: id,
+        label: name
+    }));
+    
+    const onSelect = (value: string | null) => {
+        const url = new URL(window.location.href);
+        if(value) {
+            url.searchParams.set("categoryId", value);
+        } else {
+            url.searchParams.delete("categoryId");
+        }
+        router.push(url.toString());
+    };
+    
+    return (
+        <FilterCarousel 
+            data={data} 
+            value={categoryId || null}
+            isLoading={false}
+            onSelect={onSelect}
+        />
+    );
 }
