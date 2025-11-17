@@ -9,13 +9,16 @@ export function makeQueryClient(){
         defaultOptions:{
             queries:{
                 staleTime: 30 * 1000,
+                refetchOnWindowFocus: false, 
+                retry: 1,
             },
             dehydrate:{
                 shouldDehydrateQuery:(query)=>
-                    defaultShouldDehydrateQuery(query)|| query.state.status === 'pending',
+                    defaultShouldDehydrateQuery(query) || query.state.status === 'pending',
+                serializeData: superjson.serialize,
             },
             hydrate:{
-                deserializeData : superjson.deserialize
+                deserializeData: superjson.deserialize
             }
 
         }
