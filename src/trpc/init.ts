@@ -49,13 +49,18 @@ export const protectedProcedure = t.procedure.use(async function isAuthed(opts){
     if (!user)
     {
         const clerkUser = await auth();
-        if (!clerkUser.userId || !clerkUser.sessionClaims) {
+        if (!clerkUser.userId) {
             throw new TRPCError({code:"UNAUTHORIZED"})
         }
+        const firstName = typeof clerkUser.sessionClaims?.first_name === 'string' ? clerkUser.sessionClaims.first_name : '';
+        const lastName = typeof clerkUser.sessionClaims?.last_name === 'string' ? clerkUser.sessionClaims.last_name : '';
+        const imageUrl = typeof clerkUser.sessionClaims?.image === 'string' ? clerkUser.sessionClaims.image : '';
+        const fullName = (firstName || lastName) ? `${firstName} ${lastName}`.trim() : 'User';
+        
         const [insertedUser] = await db.insert(users).values({
             clerkId: ctx.clerkUserId,
-            name: clerkUser.sessionClaims?.firstName ? `${clerkUser.sessionClaims.firstName} ${clerkUser.sessionClaims.lastName || ''}`.trim() : 'User',
-            imageUrl: clerkUser.sessionClaims?.image || '',
+            name: fullName,
+            imageUrl: imageUrl,
         }).returning();
         user = insertedUser;
     }
