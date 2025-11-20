@@ -4,7 +4,7 @@ import { httpBatchLink } from '@trpc/client';
 import { createTRPCReact } from '@trpc/react-query';
 import { useState } from 'react';
 import { makeQueryClient } from './query-client';
-import type { AppRouter } from './routers/_app';
+import type { AppRouter } from './routers/_app'; 
 import superjson from 'superjson';
 
 export const trpc = createTRPCReact<AppRouter>();
