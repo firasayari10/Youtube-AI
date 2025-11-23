@@ -5,7 +5,8 @@ import {
     VideoAssetCreatedWebhookEvent,
     VideoAssetErroredWebhookEvent,
     VideoAssetReadyWebhookEvent,
-    VideoAssetTrackReadyWebhookEvent
+    VideoAssetTrackReadyWebhookEvent,
+    VideoAssetDeletedWebhookEvent
 } from "@mux/mux-node/resources/webhooks"
 import { headers } from "next/headers";
 import { mux } from "@/lib/mux";
@@ -14,7 +15,7 @@ import { videos } from "@/db/schema";
 const SIGN_IN_SECRET = process.env.MUX_WEBHOOK_SECRET!;
 
 
-type WehookEvent = | VideoAssetCreatedWebhookEvent |VideoAssetErroredWebhookEvent|VideoAssetReadyWebhookEvent|VideoAssetTrackReadyWebhookEvent
+type WehookEvent = | VideoAssetCreatedWebhookEvent |VideoAssetErroredWebhookEvent|VideoAssetReadyWebhookEvent|VideoAssetTrackReadyWebhookEvent|VideoAssetDeletedWebhookEvent
 
 export const POST =async(request:Request)=>{
     if(!SIGN_IN_SECRET)
@@ -78,7 +79,24 @@ export const POST =async(request:Request)=>{
             .where(eq(videos.muxUploadId,data.upload_id));
             break;
         }
-        case:
+        case "video.asset.errored":{
+            const data = paylaod.data as VideoAssetErroredWebhookEvent["data"];
+            if(!data.upload_id){
+                return new Response ("Missing upload Id",{status:400})
+            }
+            await db.update(videos).set({
+                muxStatus:data.status
+            })
+            .where(eq(videos.muxUploadId, data.upload_id));
+            break;
+        }
+        case "video.asset.deleted":{
+            const data = paylaod.data as VideoAssetDeletedWebhookEvent["data"];
+            if(!data.upload_id){
+                return new Response ("Missing upload Id",{status:400})
+            }
+            await db.delete(videos).where(eq(videos.muxUploadId,data.upload_id))
+        }
     }
 
 
