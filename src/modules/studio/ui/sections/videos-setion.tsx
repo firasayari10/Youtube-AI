@@ -13,25 +13,28 @@ import {
     TableRow
 } from "@/components/ui/table"
 import Link from "next/link"
-export const VideosSection =()=>{
+import { VideoThumbnail } from "@/modules/videos/server/ui/components/video-thumbnail"
+
+export const VideosSection = () => {
     return (
         <Suspense fallback={<p>Loading ...</p>}>
             <ErrorBoundary fallback={<p>Error</p>}>
-            <VideosSectionSuspense />
+                <VideosSectionSuspense />
             </ErrorBoundary>
-            
-
         </Suspense>
     )
 }
- 
-export const VideosSectionSuspense =()=>{
-    const [videos , query] = trpc.studio.getMany.useSuspenseInfiniteQuery({
-        limit:DEFAULT_LIMIT,
-      
-    },{
-        getNextPageParam:(lastPage)=> lastPage.nextCursor
-    })
+
+export const VideosSectionSuspense = () => {
+    const [videos, query] = trpc.studio.getMany.useSuspenseInfiniteQuery(
+        {
+            limit: DEFAULT_LIMIT,
+        },
+        {
+            getNextPageParam: (lastPage) => lastPage.nextCursor
+        }
+    )
+
     return (
         <div>
             <div className="border-y">
@@ -49,30 +52,46 @@ export const VideosSectionSuspense =()=>{
                     </TableHeader>
 
                     <TableBody>
-                        {videos.pages.flatMap(p => p.items).map(video => (
-                            <TableRow key={video.id} className="cursor-pointer hover:bg-muted/30">
-                                <TableCell>
-                                    <Link href={`/studio/videos/${video.id}`}>
-                                        {video.title}
-                                    </Link>
-                                </TableCell>
-                                <TableCell>Visibility</TableCell>
-                                <TableCell>Status</TableCell>
-                                <TableCell>Date</TableCell>
-                                <TableCell className="text-right">Views</TableCell>
-                                <TableCell className="text-right">Comments</TableCell>
-                                <TableCell className="text-right pr-6">Likes</TableCell>
-                            </TableRow>
-                        ))}
+                        {videos.pages
+                            .flatMap((p) => p.items)
+                            .map((video) => (
+                                <TableRow
+                                    key={video.id}
+                                    className="cursor-pointer hover:bg-muted/30"
+                                >
+                                    <TableCell>
+                                        <Link href={`/studio/videos/${video.id}`}>
+                                            <div className="flex items-center gap-3">
+                                                <div className="relative aspect-video w-36 shrink-0 overflow-hidden rounded-md">
+                                                    <VideoThumbnail 
+                                                    imageUrl= {video.thumbnailUrl} 
+                                                    previewUrl={video.previewUrl}
+                                                    title={video.title}
+                                                    duration={video.duration || 0}/>
+                                                </div>
+                                                <span className="font-medium truncate max-w-[320px]">
+                                                    {video.title}
+                                                </span>
+                                            </div>
+                                        </Link>
+                                    </TableCell>
+
+                                    <TableCell>Visibility</TableCell>
+                                    <TableCell>Status</TableCell>
+                                    <TableCell>Date</TableCell>
+                                    <TableCell className="text-right">Views</TableCell>
+                                    <TableCell className="text-right">Comments</TableCell>
+                                    <TableCell className="text-right pr-6">Likes</TableCell>
+                                </TableRow>
+                            ))}
                     </TableBody>
                 </Table>
             </div>
 
-            
-            <InfiniteScroll 
-            hasNextPage={query.hasNextPage}
-            isFetchingNextPage={query.isFetchingNextPage}
-            fetchNextPage={query.fetchNextPage}
+            <InfiniteScroll
+                hasNextPage={query.hasNextPage}
+                isFetchingNextPage={query.isFetchingNextPage}
+                fetchNextPage={query.fetchNextPage}
             />
         </div>
     )
