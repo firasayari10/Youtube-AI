@@ -78,6 +78,7 @@ export const POST =async(request:Request)=>{
             .where(eq(videos.muxUploadId,data.upload_id));
             break;
         }
+        case:
     }
 
 
