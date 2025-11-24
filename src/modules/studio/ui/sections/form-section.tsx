@@ -27,7 +27,7 @@ import {
     SelectTrigger,
     SelectValue
 }from "@/components/ui/select" 
-import {TypeOf, z} from "zod"
+import { z} from "zod"
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { useForm} from "react-hook-form"
@@ -55,6 +55,7 @@ const FallbackSkeleton = ()=>{
 }
  const FormSectionSuspense =({videoId}:FormSectionProps)=>{
     const [video] = trpc.studio.getOne.useSuspenseQuery({id:videoId}) ; 
+    const [categories] = trpc.categories.getMany.useSuspenseQuery(); 
     const form = useForm<z.infer<typeof videoUpdateSchema>>({
         resolver: zodResolver(videoUpdateSchema) ,
         defaultValues:video,
@@ -67,7 +68,7 @@ const FallbackSkeleton = ()=>{
     return (
         <Form  {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)}>
-                    <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center justify-between mb-6 w-full-screen" >
                         <div>
                             <h1 className="text-2xl font-bold">
                                 Video Details                    
@@ -96,6 +97,70 @@ const FallbackSkeleton = ()=>{
 
                         </div>
                     
+                    </div>
+                    <div className="grid grid-cols-1 lg:gird-cols-5 gap-6">
+                        <div className="space-y-8 lg:col-span-3">
+                            <FormField 
+                            control={form.control}
+                            name="title"
+                            render={({field})=>(
+                                <FormItem >
+                                    <FormLabel>
+                                        Title
+                                    </FormLabel>
+                                    <FormControl>
+                                        <Input  {...field} placeholder="add a title to your video" className="pr-10"/>
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}/>
+                            <FormField 
+                            control={form.control}
+                            name="description"
+                            render={({field})=>(
+                                <FormItem >
+                                    <FormLabel>
+                                        Description
+                                    </FormLabel>
+                                    <FormControl>
+                                        <Textarea  {...field}  value={field.value ?? ""} 
+                                        rows={10}
+                                        placeholder="add a Description to your  video" className="pr-10"/>
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}/>
+                            <FormField 
+                            control={form.control}
+                            name="categoryId"
+                            render={({field})=>(
+                                <FormItem >
+                                    <FormLabel>
+                                        Category
+                                    </FormLabel>
+                                    <Select 
+                                    onValueChange={field.onChange}
+                                    defaultValue={field.value ?? undefined}>
+                                    <FormControl>
+                                        <SelectTrigger>
+                                            <SelectValue  placeholder="select a category "/>
+                                        </SelectTrigger>
+                                        
+                                    </FormControl>
+                                    <SelectContent>
+                                        {categories.map((category)=>(
+                                            <SelectItem  key={category.id} value="something">
+                                                {category.name}
+                                        </SelectItem>
+                                        ))} 
+                                    </SelectContent>
+                                    </Select>
+                                    <FormMessage />
+                                </FormItem>
+                            )}/>
+
+                        </div>
+
                     </div>
             </form>
         </Form>
