@@ -12,12 +12,14 @@ interface StudioUploaderProps{
 
 const UPLOADER_ID="video-uploader";
 
-export const StudioUploader = ({endpoint, }:
+export const StudioUploader = ({endpoint,onSuccess }:
     StudioUploaderProps)=>{
         return(
             <div>
                 <MuxUploader endpoint={endpoint}
                 id={UPLOADER_ID}
+                 onSuccess={onSuccess}
+                
                 className="hidden group/uploader" />
                 <MuxUploaderDrop muxUploader={UPLOADER_ID} className="group/drop">
                 <div slot="heading" className="flex flex-col items-center gap-6">
