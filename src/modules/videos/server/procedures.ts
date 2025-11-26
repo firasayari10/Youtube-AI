@@ -22,7 +22,7 @@ export const videosRouter = createTRPCRouter({
     {
       throw new TRPCError({code:"NOT_FOUND"});
     }
-    if(existingVideo.muxPlaybackId)
+    if(!existingVideo.muxPlaybackId)
     {
       throw new TRPCError({code:"BAD_REQUEST"})
     }

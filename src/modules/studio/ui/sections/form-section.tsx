@@ -90,8 +90,8 @@ const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
     const restoreThumbnail = trpc.videos.restoreThumbnail.useMutation({
         onSuccess: () => {
             utils.studio.getMany.invalidate();
-            utils.studio.getOne.invalidate({id:videoId});
-            toast.success("thumbnail resoted ")
+            utils.studio.getOne.invalidate({id: videoId});
+            toast.success("thumbnail restored ")
           
         },
         onError: () => {
