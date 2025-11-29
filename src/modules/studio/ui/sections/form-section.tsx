@@ -41,6 +41,7 @@ import Image from "next/image";
 import { THUMBNAIL_FALLBACK } from "@/modules/videos/constants";
 import { ThumbnailUploadModal } from "../layouts/components/thumbnail-upload-modal";
 import { ThumbnailGenerateModal } from "../layouts/components/thumbnail-generate-modal";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface FormSectionProps {
     videoId: string;
@@ -57,7 +58,69 @@ export const FormSection = ({ videoId }: FormSectionProps) => {
 }
 
 const FallbackSkeleton = () => {
-    return <p>loading</p>
+    return (
+        <div>
+            <div className="flex items-center justify-between mb-6">
+                <div className="space-y-2">
+                    <Skeleton className="h-7 w-32"/>
+                    <Skeleton className="h-4 w-40"/>
+
+                </div>
+            <Skeleton className="h-9 w-24"/>
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                <div className="space-y-8 lg:col-span-3">
+                         <div className="space-y-2">
+                    <Skeleton className="h-5 w-16"/>
+                    <Skeleton className="h-10 w-full"/>
+
+                </div>
+                 <div className="space-y-2">
+                    <Skeleton className="h-5 w-24"/>
+                    <Skeleton className="h-[220px] w-full"/>
+
+                </div>
+                 <div className="space-y-2">
+                    <Skeleton className="h-5 w-24"/>
+                    <Skeleton className="h-10 w-full"/>
+
+                </div>
+                
+                </div>
+                <div className="flex flex-col gap-y-8 lg:col-span-2">
+                    <div className="flex flex-col gap-4 bg-[#F9F9F9] rounded-xl overflow-hidden">
+                        <Skeleton className="aspect-video"/>
+                        <div className="px-4 py-4 space-y-6">
+                            <Skeleton  className="h-4 w-20"/>
+                            <Skeleton className="h-5 w-full"/>
+                        </div>
+                        
+                         <div className="space-y-2">
+                            <Skeleton className="h-4 w-24" />
+                            <Skeleton className="h-5 w-32" />
+                        </div>
+                        
+                         <div className="space-y-2">
+                            <Skeleton  className="h-4 w-24" />
+                            <Skeleton className="h-5 w-32" />
+                        </div>
+                        
+                        
+
+                    </div>
+
+
+                </div>
+                <div className="space-y-2">
+                    <Skeleton className="h-5 w-24"/>
+                    <Skeleton className="h-10 w-full"/>
+
+                </div>
+                
+
+            </div>
+        </div>
+    )
 }
 
 const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
@@ -102,7 +165,7 @@ const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
         }
     })
     
-    const generateTitle = trpc.videos.generateThumbnail.useMutation({
+    const generateTitle = trpc.videos.generateTitle.useMutation({
         onSuccess: () => {
            
             toast.success("background job started ", {description: " this may take some time  "})
@@ -112,7 +175,7 @@ const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
             toast.error("something went wrong!")
         }
     })
-    const generateDescription = trpc.videos.generateThumbnail.useMutation({
+    const generateDescription = trpc.videos.generateDescription.useMutation({
         onSuccess: () => {
            
             toast.success("background job started ", {description: " this may take some time  "})

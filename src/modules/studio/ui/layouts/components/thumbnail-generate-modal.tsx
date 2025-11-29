@@ -32,7 +32,7 @@ export const ThumbnailGenerateModal=({videoId,open ,onOpenChange}:ThumbnailGener
             prompt:""
         }
     });
-    const utils = trpc.useUtils() ;
+    
      const generateThumbnail = trpc.videos.generateThumbnail.useMutation({
             onSuccess: () => {
                
@@ -43,10 +43,11 @@ export const ThumbnailGenerateModal=({videoId,open ,onOpenChange}:ThumbnailGener
                 toast.error("something went wrong!")
             }
         })
-    const onSubmit = ()=>{
-        utils.studio.getMany.invalidate()
-        utils.studio.getOne.invalidate({id:videoId})
-        onOpenChange(false)
+    const onSubmit = ( values : z.infer<typeof formschema>)=>{
+       generateThumbnail.mutate({
+        prompt:values.prompt,
+        id:videoId
+       })
 
     }
     return(
@@ -74,7 +75,7 @@ export const ThumbnailGenerateModal=({videoId,open ,onOpenChange}:ThumbnailGener
                     </FormItem>
                 )}/>
                 <div className=" flex justify-end">
-                    <Button type="submit"
+                    <Button type="submit" disabled={generateThumbnail.isPending}
                     >
                         Generate
                     </Button>
