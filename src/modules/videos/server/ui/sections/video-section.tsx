@@ -6,6 +6,7 @@ import { trpc } from "@/trpc/client";
 import { Suspense } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 import { VideoPlayer } from "../components/video-player";
+import { VideoBanner } from "../components/video-banner";
 
 
 interface VideoSectionProps {
@@ -35,6 +36,7 @@ const VideosectionSuspense = ({videoId}:VideoSectionProps)=>{
             playbackId={video.muxPlaybackId}
             thumbnailUrl={video.thumbnailUrl}/>
         </div>
+        <VideoBanner status={video.muxStatus} />
         </>
     )
     
