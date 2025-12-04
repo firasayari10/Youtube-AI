@@ -12,7 +12,7 @@ export const VideoBanner = ({status}:VideoBannerProps)=>{
     <div className="bg-yellow-500 py-3 px-4 rounded-b-xl flex items-center gap-2">
         <AlertTriangleIcon  className="size-4 text-black shrink-0"/>
         <p className=" text-xs md:text-sm font-medium text-black line-clamp-1">
-            Video still proccessing ... 
+            {status}
         </p>
     </div>
    )
