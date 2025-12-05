@@ -2,6 +2,7 @@ import { VideoGetOneOutput } from "@/modules/videos/types"
 import { VideoOwner } from "./video-owner";
 import { VideoReactions } from "./video-reactions";
 import { VideoMenu } from "./video-menu";
+import { VideoDescription } from "./video-description";
 
 
 interface VideoTopRowProps {
@@ -20,10 +21,16 @@ export const VideoTopRow =({video}:VideoTopRowProps)=>{
                 <div className="flex overflow-x-auto sm:min-w-[cal(50%-6px)] 
                 sm:justify-end sm:overflow-visible pb-2 -mb-2 sm:pb-0 sm:mb-0 gap-2">
                     <VideoReactions />
-                    <VideoMenu />
+                    <VideoMenu  videoId={video.id} variant="secondary" onRemove={()=>{}}/>
 
                 </div>
             </div>
+            <VideoDescription 
+            description={video.description}
+            compactViews="1.5k"
+            expandedViews="1.503"
+            compactDate="22/22/22"
+            expandedDate="12th january 2026"/>
         </div>
     )
 }
