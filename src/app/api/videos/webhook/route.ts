@@ -46,7 +46,7 @@ export const POST = async (request: Request) => {
                 muxAssetId: data.id,
                 muxStatus: data.status
             }).where(eq(videos.muxUploadId, data.upload_id));
-            break; // ✅ added break
+            break; 
         }
 
         case "video.asset.ready": {
@@ -70,7 +70,7 @@ export const POST = async (request: Request) => {
             }
 
             const { key: thumbnailKey, url: thumbnailUrl } = uploadedThumbnail.data;
-            const { key: previewKey, url: previewUrl } = uploadedPreview.data; // ✅ fixed previewUrl
+            const { key: previewKey, url: previewUrl } = uploadedPreview.data; 
 
             await db.update(videos).set({
                 muxStatus: data.status,
@@ -82,7 +82,7 @@ export const POST = async (request: Request) => {
                 previewKey,
                 duration
             }).where(eq(videos.muxUploadId, data.upload_id));
-            break; // ✅ added break
+            break;
         }
 
         case "video.asset.errored": {
@@ -92,7 +92,7 @@ export const POST = async (request: Request) => {
             await db.update(videos).set({
                 muxStatus: data.status
             }).where(eq(videos.muxUploadId, data.upload_id));
-            break; // ✅ added break
+            break; 
         }
 
         case "video.asset.deleted": {
@@ -100,7 +100,7 @@ export const POST = async (request: Request) => {
             if (!data.upload_id) return new Response("Missing upload Id", { status: 400 });
 
             await db.delete(videos).where(eq(videos.muxUploadId, data.upload_id));
-            break; // ✅ added break
+            break; 
         }
 
         case "video.asset.track.ready": {
@@ -111,7 +111,7 @@ export const POST = async (request: Request) => {
                 muxTrackId: data.id,
                 muxTrackStatus: data.status
             }).where(eq(videos.muxAssetId, data.asset_id));
-            break; // ✅ added break
+            break; 
         }
     }
 
