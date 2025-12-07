@@ -83,7 +83,7 @@ export const videoRelations = relations(videos,({one , many})=>({
 
 export const videoViews = pgTable("video_views",{
     userId:uuid("user_id").references(()=>users.id , {onDelete:"cascade"}).notNull(),
-    videoId:uuid("user_id").references(()=>videos.id,{ onDelete:"cascade"}).notNull(),
+    videoId:uuid("video_id").references(()=>videos.id,{ onDelete:"cascade"}).notNull(),
     createdAt:timestamp("created_at").defaultNow().notNull(),
     updatedAt:timestamp("updated_at").defaultNow().notNull(),
 
