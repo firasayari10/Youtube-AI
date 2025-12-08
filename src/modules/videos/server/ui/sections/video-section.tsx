@@ -8,7 +8,7 @@ import { ErrorBoundary } from "react-error-boundary";
 import { VideoPlayer } from "../components/video-player";
 import { VideoBanner } from "../components/video-banner";
 import { VideoTopRow } from "../components/video-top-row";
-import { SignIn, useAuth } from "@clerk/nextjs";
+import {  useAuth } from "@clerk/nextjs";
 
 
 
