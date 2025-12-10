@@ -3,13 +3,15 @@ import {   createTRPCRouter, } from "../init" ;
 import { studioRouter } from "@/modules/studio/server/procedures";
 import { videosRouter } from "@/modules/videos/server/procedures";
 import { videoViewsRouter } from "@/modules/video-views/procedure";
+import { videoReactionsRouter } from "@/modules/video-reactions/procedure";
 
 
 export const appRouter = createTRPCRouter({
     videos: videosRouter,
     categories : categoriesRouter,
     studio: studioRouter,
-    videoViews: videoViewsRouter
+    videoViews: videoViewsRouter,
+    videoReactions: videoReactionsRouter
     
     
 });
