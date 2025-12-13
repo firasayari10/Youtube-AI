@@ -45,6 +45,7 @@ export const videosRouter = createTRPCRouter({
       ...getTableColumns(videos),
       user:{
         ...getTableColumns(users),
+        subscriberCount : db.$count(subscriptions , eq(subscriptions.creatorId , users.id)),
         viewerSubscribed : isNotNull(viewerSubscriptions.viewerId).mapWith(Boolean)
       },
       viewCount: db.$count(videoViews , eq(videoViews.videoId , videos.id)),
