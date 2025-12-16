@@ -2,7 +2,7 @@ import {z} from "zod"
 
 import { baseProcedure, createTRPCRouter , protectedProcedure}from "@/trpc/init";
 import {db} from "@/db";
-import {comments} from "@/db/schema"
+import { comments} from "@/db/schema"
 import {  eq } from "drizzle-orm";
 
 
@@ -13,6 +13,7 @@ export const commentsRouter = createTRPCRouter({
         videoId: z.string().uuid(),
         value : z.string()
     }))
+    
     .mutation(async({input, ctx}) => {
 
         const {videoId,value} = input ;
