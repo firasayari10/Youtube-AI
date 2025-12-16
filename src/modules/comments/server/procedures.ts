@@ -2,8 +2,8 @@ import {z} from "zod"
 
 import { baseProcedure, createTRPCRouter , protectedProcedure}from "@/trpc/init";
 import {db} from "@/db";
-import { comments} from "@/db/schema"
-import {  eq } from "drizzle-orm";
+import { comments, users} from "@/db/schema"
+import {  eq, getTableColumns } from "drizzle-orm";
 
 
 export const commentsRouter = createTRPCRouter({
@@ -40,9 +40,15 @@ export const commentsRouter = createTRPCRouter({
         const {videoId} = input ;
 
         const data = await db 
-        .select()
+        .select(
+          {
+            ...getTableColumns(comments),
+            user:users ,
+          }
+        )
         .from(comments)
         .where(eq(comments.videoId,videoId))
+        .innerJoin(users, eq(comments.userId , users.id))
 
         return data ;
     })

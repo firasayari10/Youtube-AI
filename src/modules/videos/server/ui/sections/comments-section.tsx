@@ -1,6 +1,7 @@
 "use client"
 
 import { CommentForm } from "@/modules/comments/ui/components/comment-form";
+import { CommentItem } from "@/modules/comments/ui/components/comment-item";
 import { trpc } from "@/trpc/client";
 import { Suspense } from "react";
 import { ErrorBoundary } from "react-error-boundary";
@@ -34,7 +35,14 @@ export const CommentsSectionSuspense =({videoId}:CommentsSectionProps )=>{
                 <CommentForm videoId={videoId}/>
 
             </div>
-            {JSON.stringify(comments)}
+            <div className="flex flex-col gap-4 m-2">
+                {comments.map((comment)=>(
+                    <CommentItem
+                    key={comment.id}
+                    comment={comment}/>
+                ))}
+
+            </div>
         </div>
     )
 }
