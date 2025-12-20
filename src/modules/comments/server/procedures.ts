@@ -4,6 +4,7 @@ import { baseProcedure, createTRPCRouter , protectedProcedure}from "@/trpc/init"
 import {db} from "@/db";
 import { comments, users} from "@/db/schema"
 import {  and, count, desc, eq, getTableColumns, lt, or } from "drizzle-orm";
+import { TRPCError } from "@trpc/server";
 
 
 export const commentsRouter = createTRPCRouter({
@@ -28,6 +29,35 @@ export const commentsRouter = createTRPCRouter({
         
 
     }),
+     remove:protectedProcedure
+    .input(z.object({
+        id: z.string().uuid(),
+
+    }))
+    
+    .mutation(async({input, ctx}) => {
+
+        const {id} = input ;
+        const {id:userId} = ctx.user;
+
+        const [deletedComment] = await db 
+        .delete(comments)
+        .where(and(
+            eq(comments.id,id),
+            eq(comments.userId , userId)
+        ))
+    
+        .returning();
+
+        if(!deletedComment)
+        {
+            throw new TRPCError({code:"NOT_FOUND"})
+        }
+
+        return deletedComment ;
+        
+
+    }),
     getMany:baseProcedure
     .input(
         z.object(
@@ -43,33 +73,39 @@ export const commentsRouter = createTRPCRouter({
     )
     .query(async({input})=>{
         const {videoId , cursor , limit} = input ;
-        const [totalData] = await db 
-        .select({
-            count:count(),
+        const [totalData , data] = await Promise.all([
+             db 
+                .select({
+                    count:count(),
 
-        })
-        .from(comments)
-        .where(eq(comments.videoId,videoId))
+                })
+                .from(comments)
+                .where(eq(comments.videoId,videoId)) ,
+                 db 
+                    .select(
+                    {
+                        ...getTableColumns(comments),
+                        user:users ,
+                        //totalCount: db.$count(comments, eq(comments.videoId , videoId))
 
-        const data = await db 
-        .select(
-          {
-            ...getTableColumns(comments),
-            user:users ,
-            //totalCount: db.$count(comments, eq(comments.videoId , videoId))
+                    }
+                    )
+                    .from(comments)
+                    .where(and( cursor ? or(
+                                lt( comments.updatedAt , cursor.updatedAt),
+                            and(
+                                eq(comments.updatedAt,cursor.updatedAt),
+                                lt(comments.id,cursor.id)
+                            )):undefined,eq(comments.videoId,videoId)))
+                    .innerJoin(users, eq(comments.userId , users.id))
+                    .orderBy(desc(comments.updatedAt),desc(comments.id))
+                    .limit(limit + 1 )
 
-          }
-        )
-        .from(comments)
-        .where(and( cursor ? or(
-                    lt( comments.updatedAt , cursor.updatedAt),
-                and(
-                    eq(comments.updatedAt,cursor.updatedAt),
-                    lt(comments.id,cursor.id)
-                )):undefined,eq(comments.videoId,videoId)))
-        .innerJoin(users, eq(comments.userId , users.id))
-        .orderBy(desc(comments.updatedAt),desc(comments.id))
-        .limit(limit + 1 )
+
+        ])
+   
+
+    
 
         
     const hasMore = data.length > limit ;
@@ -82,7 +118,7 @@ export const commentsRouter = createTRPCRouter({
     }:null
 
         return {
-            totalCount : totalData.count,
+            totalCount : totalData[0].count,
             items,
             nextCursor
         } ;

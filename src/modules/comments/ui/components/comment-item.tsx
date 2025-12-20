@@ -2,16 +2,42 @@ import Link from "next/link";
 import { CommentGetManyOutput } from "../../types";
 import { UserAvatar } from "@/components/user-avatar";
 import { formatDistanceToNow } from "date-fns";
-
+import { trpc } from "@/trpc/client";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu"
+import { Button } from "@/components/ui/button";
+import { MessageSquareIcon, MoreVerticalIcon, Trash2Icon } from "lucide-react";
+import { useAuth, useClerk } from "@clerk/nextjs";
+import { toast } from "sonner";
 
 interface CommentItemProps {
-    comment:CommentGetManyOutput[number];
+    comment:CommentGetManyOutput["items"][number];
 
 }
 
 export const CommentItem = ({
 comment
 }:CommentItemProps)=>{
+    const clerk = useClerk();
+    const utils = trpc.useUtils() ;
+    const {userId} = useAuth();
+    const remove =trpc.comments.remove.useMutation({
+        onSuccess:()=>{
+            toast.success("Comment deleted Successfuly !")
+            utils.comments.getMany.invalidate({videoId:comment.videoId})
+        },
+        onError:(error)=>{
+            toast.error("Failed to delete Comment ")
+            if(error.data?.code === "UNAUTHORIZED")
+            {
+                clerk.openSignIn()
+            }
+        }
+    });
     return (
         <div>
             <div className="flex gap-4">
@@ -34,11 +60,34 @@ comment
 
                     </div>
                     </Link>
+
                     <p className="text-sm">
                         {comment.value}
                     </p>
+                    {/* */}
                     
                 </div>
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button  variant="ghost" size="icon" className="size-8">
+                            <MoreVerticalIcon />
+
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                        <DropdownMenuItem>
+                            <MessageSquareIcon className="size-4"/>
+                            Reply
+                        </DropdownMenuItem>
+                        {comment.user.clerkId ===userId && (
+                            <DropdownMenuItem onClick={()=>remove.mutate({id:comment.id})}>
+                            <Trash2Icon className="size-4"/>
+                            Delete
+                        </DropdownMenuItem>
+                        ) }
+                         
+                    </DropdownMenuContent>
+                </DropdownMenu>
 
             </div>
         </div>
