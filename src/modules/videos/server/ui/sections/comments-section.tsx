@@ -36,8 +36,8 @@ export const CommentsSectionSuspense =({videoId}:CommentsSectionProps )=>{
     return (
         <div className="mt-6">
             <div className="flex flex-col gap-6" >
-                <h1>
-                    0 comments
+                <h1 className="text-xl font-bold">
+                    {comments.pages[0].totalCount} comments
                 </h1>
                 <CommentForm videoId={videoId}/>
 
