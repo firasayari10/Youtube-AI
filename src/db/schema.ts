@@ -26,26 +26,30 @@ export const subscriptions = pgTable("subscriptions",{
         columns:[t.viewerId,t.creatorId]
     })
 ])
-export const subscriptionRelations = relations(subscriptions, ({ one }) => ({
-  viewer: one(users, {
-    fields: [subscriptions.viewerId],
-    references: [users.id],
-    relationName: "user_subscriptions",
-  }),
-  creator: one(users, {
-    fields: [subscriptions.creatorId],
-    references: [users.id],
-    relationName: "user_subscribers",
-  }),
+export const subscriptionRelations = relations(subscriptions , ({one})=>({
+    viewerId: one(users,{
+        fields:[subscriptions.viewerId],
+        references:[users.id],
+        relationName:"subscription_viewer_id_fkey"
+    }),
+    creatorId:one(users,{
+        fields:[subscriptions.creatorId],
+        references:[users.id],
+        relationName:"subscription_creator_id_fkey"
+    })
 }))
-
-export const userRelations = relations(users, ({ many }) => ({
-  subscriptions: many(subscriptions, {
-    relationName: "user_subscriptions",
-  }),
-  subscribers: many(subscriptions, {
-    relationName: "user_subscribers",
-  }),
+export const userRelations = relations(users,({many})=>({
+    videos:many(videos),
+    videoViews:many(videoViews),
+    videoReactions:many(videoReactions),
+    subscriptions: many(subscriptions,{
+        relationName:"subscription_viewer_id_fkey"
+    }),
+    subscribers: many(subscriptions,{
+        relationName:"subscription_creator_id_fkey"
+    }),
+    comments:many(comments),
+    commentReactions: many(commentReactions)
 }))
 
 
@@ -59,7 +63,7 @@ export const categories = pgTable("categories",{
     updatedAt:timestamp("updated_at").defaultNow().notNull(),
 },(t)=>[uniqueIndex("name_idx").on(t.name)])
 
-export const categoryRelations = relations(users,({many})=>({
+export const categoryRelations = relations(categories,({many})=>({
     videos:many(videos)
 }))
 
