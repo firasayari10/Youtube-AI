@@ -48,7 +48,8 @@ export const userRelations = relations(users,({many})=>({
     subscribers: many(subscriptions,{
         relationName:"subscription_creator_id_fkey"
     }),
-    comments:many(comments)
+    comments:many(comments),
+    commentReactions: many(commentReactions)
 }))
 
 
@@ -147,7 +148,7 @@ export const commentReactions = pgTable("comment_reactions",{
     })
 ])
 
-export const commentRelations = relations (comments ,({one})=>({
+export const commentRelations = relations (comments ,({one , many})=>({
     user:one(users,{
         fields:[comments.userId],
         references:[users.id],
@@ -155,7 +156,19 @@ export const commentRelations = relations (comments ,({one})=>({
     video:one(videos,{
         fields:[comments.videoId],
         references:[videos.id]
+    }),
+    reactions:many(commentReactions)
+}))
+export const commetReactionRelattions = relations(commentReactions , ({one})=>({
+    user:one(users,{
+        fields:[commentReactions.userId],
+        references:[users.id],
+    }),
+     comment:one(comments,{
+        fields:[commentReactions.commentId],
+        references:[comments.id],
     })
+
 }))
 
 
