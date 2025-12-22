@@ -21,18 +21,19 @@ import { Skeleton } from "@/components/ui/skeleton"
 
 export const VideosSection = () => {
     return (
-        <Suspense fallback={ <VideosSectionSkeleton />}>
+        <Suspense fallback={<VideosSectionSkeleton />}>
             <ErrorBoundary fallback={<p>Error</p>}>
                 <VideosSectionSuspense />
             </ErrorBoundary>
         </Suspense>
     )
 }
-const  VideosSectionSkeleton = ()=>{
+
+const VideosSectionSkeleton = () => {
     return (
         <>
-        <div className="border-y">
-             <Table>
+            <div className="border-y">
+                <Table>
                     <TableHeader>
                         <TableRow>
                             <TableHead className="pl-6 w-[510px]">Video</TableHead>
@@ -45,24 +46,22 @@ const  VideosSectionSkeleton = ()=>{
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {Array.from({length: 5}).map((_,index) => (
+                        {Array.from({length: 5}).map((_, index) => (
                             <TableRow key={index}>
                                 <TableCell className="pl-6">
-                                <div className="flex items-center gap-4">
-                                    <Skeleton className="h-20 w-36" />
-                                    <div className="flex flex-col gap-2">
-                                        <Skeleton className="h-4 w-[100px]"/>
-                                        <Skeleton className="h-3 w-[150px]"/>
-
+                                    <div className="flex items-center gap-4">
+                                        <Skeleton className="h-20 w-36" />
+                                        <div className="flex flex-col gap-2">
+                                            <Skeleton className="h-4 w-[100px]"/>
+                                            <Skeleton className="h-3 w-[150px]"/>
+                                        </div>
                                     </div>
-
-                                </div>
                                 </TableCell>
                                 <TableCell>
                                     <Skeleton className="h-4 w-20"/>
                                 </TableCell>
                                 <TableCell>
-                                    <Skeleton  className="h-4 w-16"/>
+                                    <Skeleton className="h-4 w-16"/>
                                 </TableCell>
                                 <TableCell>
                                     <Skeleton className="h-4 w-24"/>
@@ -71,17 +70,16 @@ const  VideosSectionSkeleton = ()=>{
                                     <Skeleton className="h-4 w-12 ml-auto"/>
                                 </TableCell>
                                 <TableCell className="text-right">
-                                   <Skeleton className="h-4 w-12 ml-auto"/>
+                                    <Skeleton className="h-4 w-12 ml-auto"/>
                                 </TableCell>
-                                <TableCell className="text-right">
+                                <TableCell className="text-right pr-6">
                                     <Skeleton className="h-4 w-12 ml-auto"/>
                                 </TableCell>
                             </TableRow>
                         ))}
-                        
                     </TableBody>
-            </Table>
-        </div>
+                </Table>
+            </div>
         </>
     )
 }
@@ -120,17 +118,18 @@ export const VideosSectionSuspense = () => {
                                     key={video.id}
                                     className="cursor-pointer hover:bg-muted/30"
                                 >
-                                    <TableCell className="pl-6">
+                                    <TableCell className="pl-6 max-w-0">
                                         <Link href={`/studio/videos/${video.id}`}>
                                             <div className="flex items-center gap-3">
                                                 <div className="relative aspect-video w-36 shrink-0 overflow-hidden rounded-md">
                                                     <VideoThumbnail 
-                                                    imageUrl= {video.thumbnailUrl} 
-                                                    previewUrl={video.previewUrl}
-                                                    title={video.title}
-                                                    duration={video.duration || 0}/>
+                                                        imageUrl={video.thumbnailUrl} 
+                                                        previewUrl={video.previewUrl}
+                                                        title={video.title}
+                                                        duration={video.duration || 0}
+                                                    />
                                                 </div>
-                                                <div className="flex flex-col overflow-hidden gap-y-1">
+                                                <div className="flex flex-col gap-y-1 min-w-0 flex-1">
                                                     <span className="text-sm line-clamp-1">
                                                         {video.title}
                                                     </span>
@@ -146,22 +145,23 @@ export const VideosSectionSuspense = () => {
                                         <div className="flex items-center">
                                             {video.visibility === "private" ? (
                                                 <LockIcon className="size-4 mr-2"/>
-                                            ):(
-                                                <Globe2Icon  className="size-4 mr-2"/>
+                                            ) : (
+                                                <Globe2Icon className="size-4 mr-2"/>
                                             )}
                                             {snakeCaseToTitle(video.visibility)}
-
                                         </div>
                                     </TableCell>
+
                                     <TableCell>
                                         <div className="flex items-center">
                                             {snakeCaseToTitle(video.muxStatus || "error")}
-
                                         </div>
                                     </TableCell>
-                                    <TableCell className="text-sm truncate">
-                                        {format(new Date(video.createdAt),"d MMM yyyy")}
+
+                                    <TableCell className="text-sm">
+                                        {format(new Date(video.createdAt), "d MMM yyyy")}
                                     </TableCell>
+
                                     <TableCell className="text-right">Views</TableCell>
                                     <TableCell className="text-right">Comments</TableCell>
                                     <TableCell className="text-right pr-6">Likes</TableCell>

@@ -17,11 +17,13 @@ import { cn } from "@/lib/utils";
 
 interface CommentItemProps {
     comment:CommentGetManyOutput["items"][number];
+    variant?:"reply"|"comment",
 
 }
 
 export const CommentItem = ({
-comment
+comment,
+variant="comment"
 }:CommentItemProps)=>{
     const clerk = useClerk();
     const utils = trpc.useUtils() ;
@@ -128,7 +130,15 @@ comment
                             </Button>
 
                         </div>
-
+                        {variant ==="comment" && (
+                            <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8"
+                            onClick={()=>{}}>
+                                Reply
+                            </Button>
+                        )}
                     </div>
                     
                 </div>

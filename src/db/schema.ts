@@ -166,7 +166,15 @@ export const commentRelations = relations (comments ,({one , many})=>({
         fields:[comments.videoId],
         references:[videos.id]
     }),
-    reactions:many(commentReactions)
+    parent:one(comments,{
+        fields:[comments.parentId],
+        references:[comments.id],
+        relationName:"comments_parent_id_fkey",
+    }),
+    reactions:many(commentReactions),
+    replies:many(comments,{
+        relationName:"comments_parent_id_fkey",
+    })
 }))
 export const commetReactionRelattions = relations(commentReactions , ({one})=>({
     user:one(users,{
