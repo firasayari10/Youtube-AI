@@ -14,6 +14,8 @@ import { MessageSquareIcon, MoreVerticalIcon, ThumbsDownIcon, ThumbsUpIcon, Tras
 import { useAuth, useClerk } from "@clerk/nextjs";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { useState } from "react";
+import { CommentForm } from "./comment-form";
 
 interface CommentItemProps {
     comment:CommentGetManyOutput["items"][number];
@@ -26,6 +28,8 @@ comment,
 variant="comment"
 }:CommentItemProps)=>{
     const clerk = useClerk();
+    const[isReplyOpen ,setIsReplyOpen]= useState(false);
+    const [isRepliesOpen, setIsRepliesOpen]= useState(false);
     const utils = trpc.useUtils() ;
     const {userId} = useAuth();
     const remove =trpc.comments.remove.useMutation({
@@ -135,7 +139,7 @@ variant="comment"
                             variant="ghost"
                             size="sm"
                             className="h-8"
-                            onClick={()=>{}}>
+                            onClick={()=>setIsReplyOpen(true)}>
                                 Reply
                             </Button>
                         )}
@@ -150,10 +154,13 @@ variant="comment"
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                        <DropdownMenuItem>
+                        {variant ==="comment" && (
+                            <DropdownMenuItem onClick={()=>setIsRepliesOpen(true)}>
                             <MessageSquareIcon className="size-4"/>
                             Reply
                         </DropdownMenuItem>
+                        )}
+                        
                         {comment.user.clerkId ===userId && (
                             <DropdownMenuItem onClick={()=>remove.mutate({id:comment.id})}>
                             <Trash2Icon className="size-4"/>
@@ -165,6 +172,21 @@ variant="comment"
                 </DropdownMenu>
 
             </div>
+            {isReplyOpen && variant==="comment" && (
+                <div className="mt-4 pl-14">
+                    <CommentForm  
+                    videoId={comment.videoId}
+                    parentId={comment.id}
+                    variant="reply"
+                    onCancel={()=>setIsReplyOpen(false)}
+                    onSuccess={()=>{
+                        setIsReplyOpen(false);
+                        setIsRepliesOpen(true);
+                    }}
+                    />
+
+                </div>
+            )}
         </div>
     )
 }
