@@ -78,6 +78,7 @@ export const commentsRouter = createTRPCRouter({
         z.object(
              {
                 videoId:z.string().uuid(),
+                parentId:z.string().uuid().nullish(),
                 cursor:z.object({
                     id: z.string().uuid(),
                     updatedAt:z.date(),
@@ -87,7 +88,7 @@ export const commentsRouter = createTRPCRouter({
         )
     )
     .query(async({input , ctx })=>{
-        const {videoId , cursor , limit} = input ;
+        const { parentId , videoId , cursor , limit , } = input ;
         const { clerkUserId}= ctx;
         let userId;
        const [user ] = await db 
@@ -138,7 +139,6 @@ export const commentsRouter = createTRPCRouter({
                         user:users ,
                         viewerReaction: viewerReactions.type,
                         replyCount : replies.count,
-                        //totalCount: db.$count(comments, eq(comments.videoId , videoId))
                         likeCount: db.$count(
                             commentReactions,
                             and(
@@ -158,9 +158,11 @@ export const commentsRouter = createTRPCRouter({
                     )
                     .from(comments)
                     .where(and( 
-                        eq(comments.videoId , videoId),
-                        isNull(comments.parentId),
-                        cursor ? or(
+                            eq(comments.videoId , videoId),
+                            parentId
+                            ? eq(comments.parentId , parentId)
+                            : isNull(comments.parentId),
+                            cursor ? or(
                                 lt( comments.updatedAt , cursor.updatedAt),
                             and(
                                 eq(comments.updatedAt,cursor.updatedAt),
