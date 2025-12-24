@@ -1,9 +1,9 @@
 import {db} from "@/db"
-import {videos} from "@/db/schema"
+import {users, videoReactions, videos, videoViews} from "@/db/schema"
 import{ baseProcedure, createTRPCRouter } from "@/trpc/init" 
 import { TRPCError } from "@trpc/server"
 
-import {eq , and , or , lt ,desc} from "drizzle-orm"
+import {eq , and , or , lt ,desc, getTableColumns} from "drizzle-orm"
 import {z} from "zod"
 export const suggestionsRouter = createTRPCRouter({
     getMany:baseProcedure.input(z.object({
@@ -28,8 +28,31 @@ export const suggestionsRouter = createTRPCRouter({
           
         }
        
-        const data = await db.select().from(videos).
-        where(
+        const data = await db       
+        .select({
+            ...getTableColumns(videos) ,
+            user:users,
+            viewCount : db.$count(videoViews, eq(videoViews.videoId  , videos.id)),
+            likeCount: db.$count(
+                        videoReactions,
+                        and(
+                            eq(videoReactions.videoId, videos.id),
+                            eq(videoReactions.type, "like")
+                        )
+            ),
+            dislikeCount: db.$count(
+                        videoReactions,
+                        and(
+                            eq(videoReactions.videoId, videos.id),
+                            eq(videoReactions.type, "dislike")
+                        )
+            )
+
+            })
+           
+        .from(videos)
+        .innerJoin(users,eq(videos.userId ,users.id))
+        .where(
             and(
                 existingVideo.categoryId
                 ?
