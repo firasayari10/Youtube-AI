@@ -25,9 +25,8 @@ export const suggestionsRouter = createTRPCRouter({
         if(!existingVideo )
         {
             throw new TRPCError({code:"NOT_FOUND"});
-          
         }
-       
+
         const data = await db       
         .select({
             ...getTableColumns(videos) ,
@@ -47,34 +46,39 @@ export const suggestionsRouter = createTRPCRouter({
                             eq(videoReactions.type, "dislike")
                         )
             )
-
-            })
-           
+        })
         .from(videos)
         .innerJoin(users,eq(videos.userId ,users.id))
         .where(
             and(
                 not(eq(videos.id , existingVideo.id)),
+                eq(videos.visibility,"public"),
                 existingVideo.categoryId
-                ?
-                eq(videos.categoryId,existingVideo.categoryId) :
-                undefined,
-        cursor ? or(
-            lt( videos.updatedAt , cursor.updatedAt),
-        and(
-            eq(videos.updatedAt,cursor.updatedAt),
-            lt(videos.id,cursor.id)
-        )):undefined,
-    )).orderBy(desc(videos.updatedAt),desc(videos.id)).limit(limit + 1)
+                ? eq(videos.categoryId,existingVideo.categoryId) : undefined,
+                cursor ? or(
+                    lt( videos.updatedAt , cursor.updatedAt),
+                    and(
+                        eq(videos.updatedAt,cursor.updatedAt),
+                        lt(videos.id,cursor.id)
+                    )
+                ) : undefined,
+            )
+        )
+        .orderBy(desc(videos.updatedAt),desc(videos.id))
+        .limit(limit + 1)
 
-    const hasMore = data.length > limit ;
-    const items = hasMore ? data.slice(0,-1):data;
-    const lastItem = items[items.length - 1];
-    const nextCursor = hasMore ? 
-    {
-        id:lastItem.id,
-        updatedAt: lastItem.updatedAt
-    }:null
+        // Debug log
+        console.log('existingVideo:', existingVideo);
+        console.log('suggested data:', data);
+
+        const hasMore = data.length > limit ;
+        const items = hasMore ? data.slice(0,-1):data;
+        const lastItem = items[items.length - 1];
+        const nextCursor = hasMore ? 
+        {
+            id:lastItem.id,
+            updatedAt: lastItem.updatedAt
+        }:null
 
         return {
             items , nextCursor
