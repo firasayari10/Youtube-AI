@@ -8,7 +8,7 @@ interface VideoGridCardProps  {
     data: VideoGetManyOutput["items"][number];
     onRemove?: () => void;
 }
-export const VideoCardSkeleton = ()=>{
+export const VideoGridCardSkeleton = ()=>{
     return (
         <div className="flex flex-col gap-2 w-full">
             <VideoThumbnailSkeleton />

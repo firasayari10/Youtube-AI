@@ -42,6 +42,7 @@ import { THUMBNAIL_FALLBACK } from "@/modules/videos/constants";
 import { ThumbnailUploadModal } from "../layouts/components/thumbnail-upload-modal";
 import { ThumbnailGenerateModal } from "../layouts/components/thumbnail-generate-modal";
 import { Skeleton } from "@/components/ui/skeleton";
+import { APP_URL } from "@/constants";
 
 interface FormSectionProps {
     videoId: string;
@@ -159,6 +160,7 @@ const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
             toast.error("something went wrong!")
         }
     })
+
     const restoreThumbnail = trpc.videos.restoreThumbnail.useMutation({
         onSuccess: () => {
             utils.studio.getMany.invalidate();
@@ -201,7 +203,7 @@ const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
         update.mutate(data)
     }
 
-    const fullUrl = `${process.env.VERCEL_URL || "https://localhost:3000"}/videos/${videoId}` ;
+    const fullUrl = `${APP_URL || "https://localhost:3000"}/videos/${videoId}` ;
     const [isCopied , setIsCopied] = useState(false)  ;
 
     const onCopy = async()=>{
