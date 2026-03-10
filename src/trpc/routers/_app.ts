@@ -8,6 +8,7 @@ import { subscriptionsRouter } from "@/modules/subscriptions/server/procedures";
 import { commentsRouter } from "@/modules/comments/server/procedures";
 import { commentReactionsRouter } from "@/modules/comment-reactions/procedure";
 import { suggestionsRouter } from "@/modules/suggestions/server/procedures";
+import { searchRouter } from "@/modules/search/server/procedure";
 
 
 export const appRouter = createTRPCRouter({
@@ -20,6 +21,7 @@ export const appRouter = createTRPCRouter({
     comments:commentsRouter ,
     commentReactions: commentReactionsRouter,
     suggestions: suggestionsRouter ,
+    search: searchRouter ,
     
 });
 
