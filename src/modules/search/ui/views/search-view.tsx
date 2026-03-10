@@ -1,4 +1,5 @@
 import { CategoriesSection } from "@/modules/search/ui/section/category-section";
+import { ResultsSection } from "../section/results-section";
 
 interface PageProps{
         query:string|undefined ;
