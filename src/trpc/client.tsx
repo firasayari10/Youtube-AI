@@ -19,8 +19,7 @@ function getQueryClient() {
 
 function getUrl() {
   if (typeof window !== 'undefined') return '/api/trpc';
-  if (APP_URL) return `https://${process.env.VERCEL_URL}/api/trpc`;
-  return 'http://localhost:3000/api/trpc';
+     return  APP_URL;
 }
 
 export function TRPCProvider(props: { children: React.ReactNode }) {
