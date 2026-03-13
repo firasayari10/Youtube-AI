@@ -12,7 +12,7 @@ const items =[
     },
     {
         title:"Subscriptions",
-        url:"/feed/subscription",
+        url:"/feed/subscriptions",
         icon: PlaySquareIcon,
         auth:true,
     },

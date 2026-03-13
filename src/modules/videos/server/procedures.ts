@@ -10,9 +10,9 @@ import { UTApi } from "uploadthing/server";
 import z from "zod/v3";
 
 export const videosRouter = createTRPCRouter({
-  getManySubscribed: baseProcedure.input(z.object({
+  getManySubscribed: protectedProcedure.input(z.object({
          
-          categoryId:z.string().uuid().nullish(),
+          
           cursor:z.object({
               id:z.string().uuid(),
               updatedAt:z.date(),
@@ -20,37 +20,52 @@ export const videosRouter = createTRPCRouter({
           .nullish(),
           limit: z.number().min(1).max(100)
       }))
-      .query(async({input})=>{
-          const {cursor,limit  , categoryId }=input ;
+      .query(async({input, ctx})=>{
+          const{id: userId} = ctx.user ;
+          const {cursor,limit   }=input ;
+
+          const viewSubscriptions = db.$with("viewer_subscription").as(
+            db.select({
+              userId: subscriptions.creatorId,
+
+            }).
+            from(subscriptions)
+            .where(eq(subscriptions.viewerId, userId))
+          )
   
-          const data = await db.select(
+          const data = await db
+          .with(viewSubscriptions)
+          .select(
               {...getTableColumns(videos),
                     user:users ,
                     viewCount : db.$count(videoViews, eq(videoViews.videoId  , videos.id)),
-                                likeCount: db.$count(
-                                            videoReactions,
-                                            and(
-                                                eq(videoReactions.videoId, videos.id),
-                                                eq(videoReactions.type, "like")
-                                            )
-                                ),
-                                dislikeCount: db.$count(
-                                            videoReactions,
-                                            and(
-                                                eq(videoReactions.videoId, videos.id),
-                                                eq(videoReactions.type, "dislike")
-                                            )
+                    likeCount: db.$count(
+                                videoReactions,
+                                and(
+                                    eq(videoReactions.videoId, videos.id),
+                                    eq(videoReactions.type, "like")
                                 )
-              },
+                    ),
+                    dislikeCount: db.$count(
+                                videoReactions,
+                                and(
+                                    eq(videoReactions.videoId, videos.id),
+                                    eq(videoReactions.type, "dislike")
+                                )
+                    )
+  },
             
   
           )
           .from(videos)
           .innerJoin(users,eq(videos.userId ,users.id))
-  
+          .innerJoin(
+            viewSubscriptions,
+            eq(viewSubscriptions.userId , users.id)
+          )
           .where(and(
           eq(videos.visibility,"public"),
-          categoryId ? eq(videos.categoryId, categoryId) : undefined ,
+         
           cursor ? or(
               lt( videos.updatedAt , cursor.updatedAt),
           and(
