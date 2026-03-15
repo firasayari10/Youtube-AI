@@ -37,6 +37,7 @@ export const VideoReactions = ({
         {
         onSuccess:()=> {
             utils.videos.getOne.invalidate({id:videoId})
+            utils.playlists.getLike.invalidate()
         },
         onError:(error)=>{
             if(error.data?.code === "UNAUTHORIZED")

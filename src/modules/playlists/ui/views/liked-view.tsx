@@ -1,7 +1,5 @@
 "use client"
-
-import { HistoryVideosSection } from "../sections/history-videos-section";
-
+import { LikedVideosSection } from "../sections/liked-view-section";
 
 
 export const LikedView=()=>{
@@ -13,7 +11,7 @@ export const LikedView=()=>{
                 These are the videos you liked 
             </p>
            </div>
-            <HistoryVideosSection  />
+            <LikedVideosSection  />
         </div>
     )
 }
