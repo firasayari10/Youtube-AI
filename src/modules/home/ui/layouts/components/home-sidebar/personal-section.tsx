@@ -4,6 +4,7 @@ import { SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, Side
 import {  HistoryIcon,  ListVideoIcon, ThumbsUpIcon } from "lucide-react"
 import Link from "next/link"
 import {  useAuth, useClerk} from "@clerk/nextjs"
+import { usePathname } from "next/navigation"
 const items =[
     {
         title:"History",
@@ -29,6 +30,8 @@ const items =[
 export const PersonalSection =()=>{
     const clerk = useClerk();
     const  {isSignedIn} = useAuth();
+
+    const pathname = usePathname();
     return (
         <SidebarGroup>
             <SidebarGroupLabel> You </SidebarGroupLabel>
@@ -36,7 +39,7 @@ export const PersonalSection =()=>{
                 <SidebarMenu>
                     {items.map((item)=>(
                         <SidebarMenuItem key={item.title}>
-                            <SidebarMenuButton tooltip={item.title} asChild isActive={false} 
+                            <SidebarMenuButton tooltip={item.title} asChild isActive={pathname === item.url} 
                             onClick={(e)=>{
                                 if(!isSignedIn && item.auth){
                                     e.preventDefault();
