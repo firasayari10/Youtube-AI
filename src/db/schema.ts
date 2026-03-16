@@ -26,6 +26,16 @@ export const playlistVideos =pgTable("playlist_videos",{
         columns:[t.playlistId , t.videoId]
     })
 ])
+export const playlistVideoRelations = relations ( playlistVideos , ({one})=>({
+    playlist:one(playlists,{
+        fields:[playlistVideos.playlistId],
+        references:[playlists.id],
+    }),
+    video:one(videos,{
+        fields:[playlistVideos.videoId],
+        references:[videos.id],
+    })
+}))
 
 export const playlists = pgTable("playlists",{
     id: uuid("id").primaryKey().defaultRandom(),
@@ -36,6 +46,15 @@ export const playlists = pgTable("playlists",{
     updatedAt:timestamp("updated_at").defaultNow().notNull(),
 
 })
+export const playlistRelations = relations ( playlists , ({one , many })=>({
+    user:one(users,{
+        fields:[playlists.userId],
+        references:[users.id],
+    }),
+    playlistVideos:many(playlistVideos)
+,}))
+
+
 
 
 
@@ -74,7 +93,8 @@ export const userRelations = relations(users,({many})=>({
         relationName:"subscription_creator_id_fkey"
     }),
     comments:many(comments),
-    commentReactions: many(commentReactions)
+    commentReactions: many(commentReactions),
+    playlists:many(playlists),
 }))
 
 
