@@ -161,7 +161,8 @@ export const videoRelations = relations(videos,({one , many})=>({
     }),
     views:many(videoViews),
     reactions:many(videoReactions),
-    comments:many(comments)
+    comments:many(comments),
+    playlistVideos: many(playlistVideos),
 }))
 
 
