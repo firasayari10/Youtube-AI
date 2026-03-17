@@ -1,8 +1,11 @@
+import { DEFAULT_LIMIT } from "@/constants";
 import { PlaylistView } from "@/modules/playlists/ui/views/playlist-view";
-import { HydrateClient } from "@/trpc/server";
+import { HydrateClient, trpc } from "@/trpc/server";
 
 
 const Page = async ()=>{
+
+    void trpc.playlists.getMany.prefetchInfinite({limit:DEFAULT_LIMIT})
     return (
        <HydrateClient>
             <PlaylistView  />
