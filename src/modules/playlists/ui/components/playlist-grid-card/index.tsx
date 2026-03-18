@@ -1,13 +1,24 @@
 import { PlaylistsGetManyOutput } from "@/modules/playlists/types";
 import { THUMBNAIL_FALLBACK } from "@/modules/videos/constants";
 import Link from "next/link";
-import { PlaylistThumbnail } from "./playlist-thumbnail";
+import { PlaylistThumbnail, PlaylistThumbnailSkeleton } from "./playlist-thumbnail";
+import { PlaylistInfo, PlaylistInfoSkeleton } from "./playlist-info";
 
 
 interface  PlaylistGridCardProps {
     data: PlaylistsGetManyOutput["items"][number];
 
 };
+
+export const PlaylistGridCardSkeleton =()=>{
+    return (
+        <div className=" flex flex-col gap-2 w-full">
+            <PlaylistThumbnailSkeleton  />
+            <PlaylistInfoSkeleton  />
+
+        </div>
+    )
+}
 
 
 export const PlaylistGridCard = ({ data }:PlaylistGridCardProps)=>{
@@ -18,8 +29,8 @@ export const PlaylistGridCard = ({ data }:PlaylistGridCardProps)=>{
                 title={data.name}
                 videoCount = {data.videoCount}
                 />
-                {data.name}
-
+                <PlaylistInfo data={data} />
+              
             </div>
         </Link>
     )
