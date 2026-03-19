@@ -10,6 +10,117 @@ import { and, desc, eq, getTableColumns, lt, or, sql } from "drizzle-orm";
 import z from "zod/v3";
 
 export const PlaylistRouter = createTRPCRouter({
+     removeVideo :protectedProcedure
+    .input(
+        z.object({
+            playlistId:z.string().uuid(),
+            videoId:z.string().uuid()
+        }))
+        .mutation(async({input })=>{
+        const {playlistId , videoId } = input ; 
+         
+         const [existingPlaylist] = await db.select().from(playlists).where(eq(playlists.id, playlistId))
+
+         if(!existingPlaylist)
+         {
+            throw new TRPCError({code:"NOT_FOUND"});
+         }
+
+         if(!existingPlaylist.userId)
+         {
+            throw new TRPCError({code:"FORBIDDEN"})
+         }
+
+         const [exisitingVideo] = await db.select().from(videos).where(eq(videos.id, videoId));
+         if(!exisitingVideo)
+         {
+            throw new TRPCError({code:"NOT_FOUND"})
+         }
+         if(!exisitingVideo.userId)
+         {
+            throw new TRPCError({code:"FORBIDDEN"})
+         }
+
+         const [existingPlaylistVideo] = await db 
+         .select()
+         .from(playlistVideos)
+         .where(
+            and(
+                eq(playlistVideos.playlistId , playlistId),
+                eq(playlistVideos.videoId, videoId)
+            )
+         );
+
+         if(!existingPlaylistVideo){
+            throw new TRPCError({code:"NOT_FOUND"}) ;
+         }
+
+         const [deletedPlaylsitVideo] = await db 
+         .delete(playlistVideos)
+         .where(and(
+            eq(
+                playlistVideos.playlistId , playlistId
+            ),
+            eq(
+                playlistVideos.videoId , videoId 
+            )
+         ))
+         .returning();
+
+         return deletedPlaylsitVideo ;
+ }),
+     addVideo :protectedProcedure
+    .input(
+        z.object({
+            playlistId:z.string().uuid(),
+            videoId:z.string().uuid()
+        }))
+        .mutation(async({input  })=>{
+        const {playlistId , videoId } = input ; 
+        
+         const [existingPlaylist] = await db.select().from(playlists).where(eq(playlists.id, playlistId))
+
+         if(!existingPlaylist)
+         {
+            throw new TRPCError({code:"NOT_FOUND"});
+         }
+
+         if(!existingPlaylist.userId)
+         {
+            throw new TRPCError({code:"FORBIDDEN"})
+         }
+
+         const [exisitingVideo] = await db.select().from(videos).where(eq(videos.id, videoId));
+         if(!exisitingVideo)
+         {
+            throw new TRPCError({code:"NOT_FOUND"})
+         }
+         if(!exisitingVideo.userId)
+         {
+            throw new TRPCError({code:"FORBIDDEN"})
+         }
+
+         const [existingPlaylistVideo] = await db 
+         .select()
+         .from(playlistVideos)
+         .where(
+            and(
+                eq(playlistVideos.playlistId , playlistId),
+                eq(playlistVideos.videoId, videoId)
+            )
+         );
+
+         if(existingPlaylistVideo){
+            throw new TRPCError({code:"CONFLICT"}) ;
+         }
+
+         const [createdPlaylsitVideo] = await db 
+         .insert(playlistVideos)
+         .values({playlistId, videoId})
+         .returning();
+
+         return createdPlaylsitVideo ;
+ }),
     getManyForVideo: protectedProcedure
     .input(z.object({
         videoId:z.string().uuid(), 
@@ -184,7 +295,15 @@ export const PlaylistRouter = createTRPCRouter({
                     playlistVideos,
                     eq(playlists.id, playlistVideos.playlistId)
                 ),
-                user:users
+               thumbnailUrl: sql<string | null>`
+                        (
+                            SELECT v.thumbnail_url
+                            FROM ${playlistVideos} pv
+                            JOIN ${videos} v ON v.id = pv.video_id
+                            WHERE pv.playlist_id = ${playlists.id}
+                            ORDER BY pv.updated_at DESC
+                            LIMIT 1
+                        )`   
                    },
             
   
