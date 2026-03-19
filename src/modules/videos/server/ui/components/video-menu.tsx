@@ -32,7 +32,7 @@ export const VideoMenu =( { videoId, variant="ghost" , onRemove}:VideoMenuProps)
     }
     return (
         <>
-        <PlaylistAddModal   open={isopenPlaylistAddModal} onOpenChange={setIsOpenPlaylistAddModal}/>
+        <PlaylistAddModal   open={isopenPlaylistAddModal} onOpenChange={setIsOpenPlaylistAddModal} videoId={videoId}/>
         <DropdownMenu>
                    <DropdownMenuTrigger asChild>
                     <Button variant={variant} size="icon" className="rounded-full">    

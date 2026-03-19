@@ -4,7 +4,7 @@ import { playlists, playlistVideos, users, videoReactions, videos,  videoViews }
 import {  createTRPCRouter, protectedProcedure } from "@/trpc/init";
 import { TRPCError } from "@trpc/server";
 
-import { and, desc, eq, getTableColumns, lt, or } from "drizzle-orm";
+import { and, desc, eq, getTableColumns, lt, or, sql } from "drizzle-orm";
 
 
 import z from "zod/v3";
@@ -21,7 +21,7 @@ export const PlaylistRouter = createTRPCRouter({
           limit: z.number().min(1).max(100)
       }))
       .query(async({input , ctx })=>{
-          const {cursor,limit  }=input ;
+          const {cursor,limit ,videoId }=input ;
           const {id:userId} = ctx.user ;
           const data = await db.select(
               {...getTableColumns(playlists),
@@ -29,7 +29,11 @@ export const PlaylistRouter = createTRPCRouter({
                     playlistVideos,
                     eq(playlists.id, playlistVideos.playlistId)
                 ),
-                user:users
+                user:users,
+                containsVideo:videoId ? sql<boolean>`(
+                SELECT EXISTS   (
+                SELECT 1 FROM ${playlistVideos} pv WHERE pv.playlist_id =${playlists.id} AND pv.video_id=${videoId})
+                )`:sql<boolean>`false`,
                    },
             
   
@@ -61,86 +65,7 @@ export const PlaylistRouter = createTRPCRouter({
           }
       }),
 
-      getLike: protectedProcedure.input(z.object({
-         
-         
-          cursor:z.object({
-              id:z.string().uuid(),
-              likedAt:z.date(),
-          })
-          .nullish(),
-          limit: z.number().min(1).max(100)
-      }))
-      .query(async({input , ctx })=>{
-          const {cursor,limit  }=input ;
-          const {id:userId} = ctx.user ;
-
-          const viewerVideoReactions = db.$with("view_video_reactions").as
-          (
-            db.select(  {
-                videoId: videoReactions.videoId,
-                liked_at: videoReactions.updatedAt,
-
-            })
-            .from(videoReactions)
-            .where(and(
-                eq(videoReactions.userId,userId),
-                eq(videoReactions.type , "like")
-              
-          )));
-  
-          const data = await db.with
-            (viewerVideoReactions).select(
-              {...getTableColumns(videos),
-                    user:users ,
-                    likedAt: viewerVideoReactions.liked_at,
-                    viewCount : db.$count(videoViews, eq(videoViews.videoId  , videos.id)),
-                                likeCount: db.$count(
-                                            videoReactions,
-                                            and(
-                                                eq(videoReactions.videoId, videos.id),
-                                                eq(videoReactions.type, "like")
-                                            )
-                                ),
-                                dislikeCount: db.$count(
-                                            videoReactions,
-                                            and(
-                                                eq(videoReactions.videoId, videos.id),
-                                                eq(videoReactions.type, "dislike")
-                                            )
-                                )
-              },
-            
-  
-          )
-          .from(videos)
-          .innerJoin(users,eq(videos.userId ,users.id))
-          .innerJoin(viewerVideoReactions,eq(videos.id ,viewerVideoReactions.videoId))
-  
-          .where(and(
-          eq(videos.visibility,"public"),
-          
-          cursor ? or(
-              lt( viewerVideoReactions.liked_at , cursor.likedAt),
-          and(
-              eq(viewerVideoReactions.liked_at,cursor.likedAt),
-              lt(videos.id,cursor.id)
-          )):undefined,
-      )).orderBy(desc(viewerVideoReactions.liked_at),desc(videos.id)).limit(limit + 1)
-  
-      const hasMore = data.length > limit ;
-      const items = hasMore ? data.slice(0,-1):data;
-      const lastItem = items[items.length - 1];
-      const nextCursor = hasMore ? 
-      {
-          id:lastItem.id,
-          likedAt: lastItem.likedAt
-      }:null
-  
-          return {
-              items , nextCursor
-          }
-      }),
+      
 
  create :protectedProcedure
  .input(z.object({name:z.string().min(1)}))
