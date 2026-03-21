@@ -162,9 +162,9 @@ export const VideosSectionSuspense = () => {
                                         {format(new Date(video.createdAt), "d MMM yyyy")}
                                     </TableCell>
 
-                                    <TableCell className="text-right">Views</TableCell>
-                                    <TableCell className="text-right">Comments</TableCell>
-                                    <TableCell className="text-right pr-6">Likes</TableCell>
+                                    <TableCell className="text-right">{video.viewCount}</TableCell>
+                                    <TableCell className="text-right">{video.commentCount}</TableCell>
+                                    <TableCell className="text-right pr-6">{video.likeCount}</TableCell>
                                 </TableRow>
                             ))}
                     </TableBody>
