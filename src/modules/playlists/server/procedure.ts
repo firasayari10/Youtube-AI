@@ -10,6 +10,100 @@ import { and, desc, eq, getTableColumns, lt, or, sql } from "drizzle-orm";
 import z from "zod/v3";
 
 export const PlaylistRouter = createTRPCRouter({
+     getVideos: protectedProcedure.input(z.object({
+         playlistId:z.string().uuid(),
+          cursor:z.object({
+              id:z.string().uuid(),
+              updateddAt:z.date(),
+          })
+          .nullish(),
+          limit: z.number().min(1).max(100)
+      }))
+      .query(async({input , ctx  })=>{
+        const {id:userId}= ctx.user ;
+          const {cursor,limit , playlistId }=input ;
+          const [exisitingPlaylist] = await db 
+          .select()
+          .from(playlists)
+          .where(
+            and(
+                eq(
+                    playlists.id , playlistId
+                ),
+                eq(playlists.userId , userId)
+            )
+          )
+
+          if(!exisitingPlaylist)
+          {
+            throw new TRPCError({code:"NOT_FOUND"})
+          }
+          //const {id:userId} = ctx.user ;
+
+          const videosFromPlaylists = db.$with("playlist_videos").as
+          (
+            db.select(  {
+                videoId: playlistVideos.videoId,
+               
+
+            })
+            .from(playlistVideos)
+            .where(eq(
+                playlistVideos.playlistId,playlistId
+            ))
+          )
+  
+          const data = await db.with
+            (videosFromPlaylists).select(
+              {...getTableColumns(videos),
+                    user:users ,
+                    viewCount : db.$count(videoViews, eq(videoViews.videoId  , videos.id)),
+                                likeCount: db.$count(
+                                            videoReactions,
+                                            and(
+                                                eq(videoReactions.videoId, videos.id),
+                                                eq(videoReactions.type, "like")
+                                            )
+                                ),
+                                dislikeCount: db.$count(
+                                            videoReactions,
+                                            and(
+                                                eq(videoReactions.videoId, videos.id),
+                                                eq(videoReactions.type, "dislike")
+                                            )
+                                )
+              },
+            
+  
+          )
+          .from(videos)
+          .innerJoin(users,eq(videos.userId ,users.id))
+          .innerJoin(videosFromPlaylists,eq(videos.id ,videosFromPlaylists.videoId))
+  
+          .where(and(
+          eq(videos.visibility,"public"),
+          
+          cursor ? or(
+              lt( videos.updatedAt , cursor.updateddAt),
+          and(
+              eq(videos.updatedAt,cursor.updateddAt),
+              lt(videos.id,cursor.id)
+          )):undefined,
+      )).orderBy(desc(videos.updatedAt),desc(videos.id)).limit(limit + 1)
+  
+      const hasMore = data.length > limit ;
+      const items = hasMore ? data.slice(0,-1):data;
+      const lastItem = items[items.length - 1];
+      const nextCursor = hasMore ? 
+      {
+          id:lastItem.id,
+          updatedAt: lastItem.updatedAt
+      }:null
+  
+          return {
+              items , nextCursor
+          }
+      }),
      removeVideo :protectedProcedure
     .input(
         z.object({
