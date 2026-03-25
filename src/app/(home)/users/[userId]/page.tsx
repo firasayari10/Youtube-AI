@@ -1,3 +1,5 @@
+import { DEFAULT_LIMIT } from "@/constants";
+import { VideosSection } from "@/modules/users/ui/sections/videos-section";
 import { UserView } from "@/modules/users/ui/views/user-view";
 import { HydrateClient, trpc } from "@/trpc/server";
 
@@ -12,9 +14,11 @@ const Page = async ({ params}:PageProps)=>{
     const {userId} = await params;
 
     await  trpc.users.getOne.prefetch({id:userId})
+    await trpc.videos.getMany.prefetchInfinite({userId,limit:DEFAULT_LIMIT})
     return (
         <HydrateClient> 
             <UserView  userId={userId}/>
+            <VideosSection userId={userId  }/>
         </HydrateClient>
     )
 }
