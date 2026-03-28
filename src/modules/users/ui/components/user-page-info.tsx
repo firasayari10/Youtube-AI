@@ -67,7 +67,7 @@ export const UserPageInfo = ({ user }: UserPageInfoProps) => {
                             {user.name}
                         </h1>
                         <div className="flex items-center gap-1 text-xs text-muted-foreground mt-0.5">
-                            <span>{user.SubscriptionCount} subscribers</span>
+                            <span>{user.subscriberCount} subscribers</span>
                             <span>•</span>
                             <span>{user.videoCount} Videos</span>
                         </div>
@@ -75,7 +75,7 @@ export const UserPageInfo = ({ user }: UserPageInfoProps) => {
                 </div>
                 {userId === user.clerkId ? (
                     <Button variant="secondary" asChild className="w-full mt-2 rounded-full text-xs h-8">
-                        <Link href="/studio">Go to Studio</Link>
+                        <Link prefetch href="/studio">Go to Studio</Link>
                     </Button>
                 ) : (
                     <SubscriptionButton
@@ -101,13 +101,13 @@ export const UserPageInfo = ({ user }: UserPageInfoProps) => {
                         {user.name}
                     </h1>
                     <div className="flex items-center gap-1.5 text-sm text-muted-foreground mt-0.5">
-                        <span>{user.SubscriptionCount} subscribers</span>
+                        <span>{user.subscriberCount} subscribers</span>
                         <span>•</span>
                         <span>{user.videoCount} Videos</span>
                     </div>
                     {userId === user.clerkId ? (
                         <Button variant="secondary" asChild className="mt-2 rounded-full text-sm h-8 w-fit">
-                            <Link href="/studio">Go to Studio</Link>
+                            <Link prefetch href="/studio">Go to Studio</Link>
                         </Button>
                     ) : (
                         <SubscriptionButton

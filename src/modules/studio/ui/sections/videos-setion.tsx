@@ -119,7 +119,7 @@ export const VideosSectionSuspense = () => {
                                     className="cursor-pointer hover:bg-muted/30"
                                 >
                                     <TableCell className="pl-6 max-w-0">
-                                        <Link href={`/studio/videos/${video.id}`}>
+                                        <Link prefetch href={`/studio/videos/${video.id}`}>
                                             <div className="flex items-center gap-3">
                                                 <div className="relative aspect-video w-36 shrink-0 overflow-hidden rounded-md">
                                                     <VideoThumbnail 
